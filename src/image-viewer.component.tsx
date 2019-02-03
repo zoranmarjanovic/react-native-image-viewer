@@ -18,6 +18,7 @@ import {
 import ImageZoom from 'react-native-image-pan-zoom';
 import styles from './image-viewer.style';
 import { IImageInfo, IImageSize, Props, State } from './image-viewer.type';
+const {width: SCREEN_WIDHT, height: SCREEN_HEIGHT} = Dimensions.get('window')
 
 export default class ImageViewer extends React.Component<Props, State> {
   public static defaultProps = new Props();
@@ -201,9 +202,17 @@ export default class ImageViewer extends React.Component<Props, State> {
       },
       () => {
         try {
-          const data = (Image as any).resolveAssetSource(image.props.source);
-          imageStatus.width = data.width;
-          imageStatus.height = data.height;
+          const assetSource = (typeof image.props !== 'undefined')
+                  ? image.props.source
+                  : image.source
+          const data = (Image as any).resolveAssetSource(assetSource);
+          if (data !== null) {
+            imageStatus.width = data.width;
+            imageStatus.height = data.height;
+          } else {
+            imageStatus.width = SCREEN_WIDHT;
+            imageStatus.height = SCREEN_HEIGHT - 140;
+          }
           imageStatus.status = 'success';
           saveImageSize();
         } catch (newError) {
